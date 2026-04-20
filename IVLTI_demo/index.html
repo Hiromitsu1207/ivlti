@@ -1,0 +1,1424 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第五人格赛事 IVLTI 人格测试</title>
+  <style>
+    :root {
+      --bg: #fffbea;
+      --panel: #ffffff;
+      --text: #2f251c;
+      --muted: #7a6755;
+      --line: #f0dfc2;
+      --soft: #fff1d3;
+      --accent: #a4774f;
+      --accent-strong: #6f4324;
+      --shadow: 0 16px 40px rgba(111, 67, 36, 0.10);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, #fffbea 0, #fffbea 36%, #fff1d2 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-top: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(212, 168, 91, 0.22), rgba(212, 168, 91, 0.05));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      max-width: 680px;
+    }
+    .hero .sub {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+      max-width: 720px;
+    }
+    .home-author {
+      margin-top: 12px;
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 700;
+      background: #fffefa;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 12px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 24px;
+    }
+
+    .mini-panel {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffdf7, #fff0cf);
+    }
+
+    .mini-panel h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .mini-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+        .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .hero-minimal {
+      min-height: 48vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 42px 20px;
+    }
+    .hero-minimal::after { display: none; }
+    .hero-minimal h1 {
+      max-width: none;
+      margin: 0;
+    }
+    .hero-actions-single {
+      justify-content: center;
+      margin-top: 28px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+      font: inherit;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
+
+    .btn-primary {
+      background: var(--accent-strong);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(111, 67, 36, 0.20);
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--accent-strong);
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .test-wrap,
+    .result-wrap {
+      margin-top: 22px;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .progress {
+      flex: 1;
+      min-width: 240px;
+      height: 10px;
+      background: #fffdf6;
+      border: 1px solid #ead8b8;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #e5c58a, #6f4324);
+      border-radius: inherit;
+      transition: width .22s ease;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .question-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .question {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fffdf6);
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .question.missing {
+      border-color: #d94b4b;
+      background: linear-gradient(180deg, #fffafa, #fff4f4);
+      box-shadow: 0 12px 30px rgba(217, 75, 75, 0.14);
+    }
+
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    .question-title {
+      font-size: 16px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .question-warning {
+      display: none;
+      margin-top: 10px;
+      color: #c93636;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .question.missing .question-warning {
+      display: block;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+
+    .option:hover {
+      border-color: #ead3aa;
+      background: #fffaf0;
+    }
+
+    .option input {
+      margin-top: 3px;
+      accent-color: var(--accent-strong);
+      transform: scale(1.1);
+      flex-shrink: 0;
+    }
+
+    .option-code {
+      font-weight: 800;
+      color: var(--accent-strong);
+      min-width: 22px;
+    }
+
+    .question-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .question-nav button {
+      min-width: 104px;
+    }
+    .actions-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      padding-top: 6px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .result-hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .type-box,
+    .score-box,
+    .dim-box,
+    .top3-box,
+    .about-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fffdf6);
+    }
+
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+      letter-spacing: .05em;
+    }
+
+    .type-name {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .type-subname {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .match {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-weight: 700;
+    }
+
+    .type-desc {
+      margin-top: 18px;
+      line-height: 1.85;
+      font-size: 15px;
+      color: #3b2d22;
+    }
+
+    .score-box h3,
+    .dim-box h3,
+    .top3-box h3,
+    .about-box h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .score-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .score-item .k {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .score-item .v {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent-strong);
+    }
+
+    .dim-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .dim-pill {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .dim-pill .label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .dim-pill .value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent-strong);
+    }
+
+    .top3-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .top3-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .top3-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .top3-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .top3-score {
+      color: var(--accent-strong);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .about-box p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    
+    .result-layout {
+      display: grid;
+      gap: 18px;
+    }
+    .result-top {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .poster-box, .type-box, .analysis-box, .dim-box, .note-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #fffdf6);
+    }
+        .poster-box {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 280px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(212,168,91,0.20), rgba(212,168,91,0) 40%),
+        linear-gradient(180deg, #ffffff, #fff3d8);
+    }
+    .poster-box::after {
+      content: "";
+      position: absolute;
+      right: -46px;
+      bottom: -46px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(212,168,91,0.16), rgba(212,168,91,0.03));
+      pointer-events: none;
+    }
+    .poster-image {
+      width: 100%;
+      min-height: 220px;
+      max-height: 460px;
+      object-fit: contain;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.75);
+      position: relative;
+      z-index: 1;
+    }
+    .poster-box.no-image .poster-image {
+      display: none;
+    }
+    .poster-caption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+    .type-kicker {
+      font-size: 12px;
+      color: var(--accent-strong);
+      margin-bottom: 8px;
+      letter-spacing: .06em;
+    }
+    .type-name {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+    .type-subname {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .match {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .analysis-box h3, .dim-box h3, .note-box h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .result-actions {
+      margin-top: 22px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .analysis-box p {
+      margin: 0;
+      color: #3b2d22;
+      font-size: 15px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+    .dim-list {
+      display: grid;
+      gap: 12px;
+    }
+    .dim-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+    .dim-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .dim-item-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .dim-item-score {
+      color: var(--accent-strong);
+      font-weight: 800;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .dim-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .note-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .author-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff, #fffdf6);
+      overflow: hidden;
+    }
+    .author-box summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .author-box summary::-webkit-details-marker { display: none; }
+    .author-box summary::after {
+      content: '展开';
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      padding: 6px 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .author-box[open] summary::after {
+      content: '收起';
+    }
+    .author-content {
+      border-top: 1px solid var(--line);
+      padding: 0 18px 18px;
+    }
+    .author-content p {
+      margin: 14px 0 0;
+      color: #3b2d22;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    @media (max-width: 860px) {
+      .result-top { grid-template-columns: 1fr; }
+    }
+
+@media (max-width: 860px) {
+      .hero-grid,
+      .result-hero {
+        grid-template-columns: 1fr;
+      }
+      .dim-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .shell { padding: 14px 12px 42px; }
+      .hero, .test-wrap, .result-wrap { padding: 16px; }
+      .hero h1 { font-size: 32px; }
+      .question-title { font-size: 15px; }
+      .dim-grid,
+      .score-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section id="intro" class="screen active">
+      <div class="hero card hero-minimal">
+        <h1>第五人格赛事 IVLTI 人格测试</h1>
+        <div class="sub">测测你最像IVL里的谁</div>
+        <div class="home-author">作者：月亮成瘾症</div>
+        <div class="hero-actions hero-actions-single">
+          <button id="startBtn" class="btn-primary">开始测试</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="test" class="screen">
+      <div class="test-wrap card">
+        <div class="topbar">
+          <div class="progress"><span id="progressBar"></span></div>
+          <div class="progress-text" id="progressText">0 / 30</div>
+        </div>
+
+        <div id="questionList" class="question-list"></div>
+
+        <div class="actions-bottom">
+          <div class="hint" id="testHint"></div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="backIntroBtn" class="btn-secondary">返回首页</button>
+            <button id="submitBtn" class="btn-primary" disabled>提交并查看结果</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    <section id="result" class="screen">
+      <div class="result-wrap card">
+        <div class="result-layout">
+          <div class="result-top">
+            <div class="poster-box" id="posterBox">
+              <img id="posterImage" class="poster-image" alt="人格结果图" />
+              <div id="posterCaption" class="poster-caption">你的IVL人格</div>
+            </div>
+
+            <div class="type-box">
+              <div class="type-kicker" id="resultModeKicker">你的主类型</div>
+              <div class="type-name" id="resultTypeName">IVL人格</div>
+              <div class="match" id="matchBadge">匹配度 92%</div>
+              <div class="type-subname" id="resultTypeSub">系统备注会显示在这里。</div>
+            </div>
+          </div>
+
+          <div class="analysis-box">
+            <h3>该人格的简单解读</h3>
+            <p id="resultDesc"></p>
+          </div>
+
+          <div class="dim-box">
+            <h3>十维度评分</h3>
+            <div id="dimList" class="dim-list"></div>
+          </div>
+
+          <div class="note-box">
+            <h3>友情提示</h3>
+            <p id="funNote">本测试仅供娱乐，测完你也可以去打IVL！</p>
+          </div>
+
+        </div>
+
+        <div class="result-actions">
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="restartBtn" class="btn-secondary">重新测试</button>
+            <button id="toTopBtn" class="btn-primary">回到首页</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  
+  <script>
+  
+    // 维度元数据：定义测试的10个维度及其所属模型
+	const dimensionMeta = {
+	  AGG: { name: 'AGG 攻击性', model: 'IVL赛事人格模型' },
+	  STL: { name: 'STL 稳定性', model: 'IVL赛事人格模型' },
+	  CMD: { name: 'CMD 控场欲', model: 'IVL赛事人格模型' },
+	  MEC: { name: 'MEC 操作秀感', model: 'IVL赛事人格模型' },
+	  ADP: { name: 'ADP 适应力', model: 'IVL赛事人格模型' },
+	  MEM: { name: 'MEM 整活度', model: 'IVL赛事人格模型' },
+	  EMO: { name: 'EMO 情绪外放', model: 'IVL赛事人格模型' },
+	  AUR: { name: 'AUR 舞台感', model: 'IVL赛事人格模型' },
+	  BEL: { name: 'BEL 信念感', model: 'IVL赛事人格模型' },
+	  TEAM:{ name: 'TEAM 个人英雄倾向', model: 'IVL赛事人格模型' }
+	};
+	const opts = [
+	  { label: '完全不认同', value: 1 },
+	  { label: '有点不认同', value: 2 },
+	  { label: '中立', value: 3 },
+	  { label: '有点认同', value: 4 },
+	  { label: '完全认同', value: 5 }
+	];
+	const questions = [
+	  // AGG
+	  { id:'q1', dim:'AGG', text:'在一段关系里，我经常是偏强势的一方。', options:opts },
+	  { id:'q2', dim:'AGG', text:'我倾向于主动出击，而不是等机会出现。', options:opts },
+	  { id:'q3', dim:'AGG', text:'面对挑衅时，比起忍耐，我更想直接反击。', options:opts },
+
+	  // STL
+	  { id:'q4', dim:'STL', text:'在游戏对局中，我不太容易红温。', options:opts },
+	  { id:'q5', dim:'STL', text:'别人通常觉得我很靠谱。', options:opts },
+	  { id:'q6', dim:'STL', text:'在对局中，需要抗压时，我能够站出来。', options:opts },
+
+	  // CMD
+	  { id:'q7', dim:'CMD', text:'在四排中，我通常担任指挥。', options:opts },
+	  { id:'q8', dim:'CMD', text:'我更关注游戏整体局势的走向，而不是操作细节。', options:opts },
+	  { id:'q9', dim:'CMD', text:'没有人做决定时我会主动站出来。', options:opts },
+
+	  // MEC
+	  { id:'q10', dim:'MEC', text:'比起纯牵制和救人，我更喜欢玩ob位。', options:opts },
+	  { id:'q11', dim:'MEC', text:'我会为了精彩操作承担风险。', options:opts },
+	  { id:'q12', dim:'MEC', text:'对局中，我会为了赢而选择带激进的天赋。', options:opts },
+
+	  // ADP
+	  { id:'q13', dim:'ADP', text:'我能快速适应新环境或变化。', options:opts },
+	  { id:'q14', dim:'ADP', text:'我喜欢玩版本强势角色，不受委屈。', options:opts },
+	  { id:'q15', dim:'ADP', text:'我了解最新的体系和打法，并自己在游戏中体验。', options:opts },
+
+	  // MEM
+	  { id:'q16', dim:'MEM', text:'我经常无意间制造节目效果。', options:opts },
+	  { id:'q17', dim:'MEM', text:'我不在意别人对我的恶意，只要做好自己就行。', options:opts },
+	  { id:'q18', dim:'MEM', text:'我不介意别人开我的玩笑，即使内容有点冒犯。', options:opts },
+
+	  // EMO
+	  { id:'q19', dim:'EMO', text:'我是“心情写在脸上”的类型。', options:opts },
+	  { id:'q20', dim:'EMO', text:'如果不高兴，我会选择倾诉而不是憋在心里。', options:opts },
+	  { id:'q21', dim:'EMO', text:'别人能够轻易察觉我的心情好不好。', options:opts },
+
+	  // AUR
+	  { id:'q22', dim:'AUR', text:'我希望自己成为“显眼包”。', options:opts },
+	  { id:'q23', dim:'AUR', text:'我认为自己是一个讨人喜欢的人。', options:opts },
+	  { id:'q24', dim:'AUR', text:'我很在乎别人对自己的看法。', options:opts },
+
+	  // BEL
+	  { id:'q25', dim:'BEL', text:'我认定一件事，就很难被别人说服改变。', options:opts },
+	  { id:'q26', dim:'BEL', text:'质疑声再大一点好吗，怎么有点不够我看啊！', options:opts },
+	  { id:'q27', dim:'BEL', text:'我是一个不在乎所有人的普通人', options:opts },
+
+	  // TEAM
+	  { id:'q28', dim:'TEAM', text:'在队友失误的时候，我会先安慰队友。', options:opts },
+	  { id:'q29', dim:'TEAM', text:'我正在为维护一个团队的关系付出努力。', options:opts },
+	  { id:'q30', dim:'TEAM', text:'我认为同心协力比单打独斗走得更远。', options:opts }
+	];
+
+    // 人格类型库：定义 IVL 赛事人格类型信息
+    const TYPE_LIBRARY = {
+
+  "487": {
+    "code": "487",
+    "cn": "老大",
+    "intro": "免费的东西别急 看我心情懂吗 老子才是老大",
+    "desc": "何添顺 你没有对不起任何人，铺天盖地的虚假黑料里分明藏着你脆弱善良的真心，被有意之人扭曲成绯闻，我比任何人都心疼你，在成为487前，你先是何添顺，所以，祝你幸福，你永远都有追求幸福的能力和勇气。"
+  },
+  "DONGX": {
+    "code": "DONGX",
+    "cn": "大魔王",
+    "intro": "天不生我东玄，监管万古如长夜",
+    "desc": "网上说说得了，私下谁不想急头白脸看玄巫大人四抓！网上说说得了，私下谁不想急头白脸看玄巫大人四抓！网上说说得了，私下谁不想急头白脸看玄巫大人四抓！"
+  },
+  "PPX": {
+    "code": "PPX",
+    "cn": "上古屠皇",
+    "intro": "破茧成蝶，美人为限",
+    "desc": "是记忆里那个微笑招手、看起来腼腆温柔却又在赛场上大杀四方的屠皇，是认认真真、谦虚低调、内心纯粹的少年。你是无数人的白月光，也是伟大的引路人。万物有期限，皮皮当无限。山高水长，未来灿烂。"
+  },
+  "N1E": {
+    "code": "N1E",
+    "cn": "冬虫夏草",
+    "intro": "许哥是区？许哥nb！",
+    "desc": "许立觉得淡淡的就会顺顺的，于是许立把手摊开，允许所有人类四跑。许立休恋逝水，许立早悟兰因，许立白水鉴心。被四跑的瞬间，许立确信，这就是许立用尽全力找寻的幸福。在空闪卡脚错传的瞬间，杭州人站在光里。许立恨来恨去，只是恨你不够爱许立。许立希望下雨，然后不要回南天。许立只是回南天里缓缓爬过的区，所以监管都要有像许立一样被轻松四跑的勇气。许立你是否知晓一切，我跟以前那个拿出iv战无不胜的捏捏告状。许立人吞咽了太多四跑三跑，但其实生命只需要呼吸。许立请求求生高抬贵手，他不愿再看到四跑的动画。"
+  },
+  "TZYM": {
+    "code": "TZYM",
+    "cn": "全场游龙",
+    "intro": "想不想被我打屁股",
+    "desc": "爱情是什么？有人说是相濡以沫，有人说是相互尊重，而兔旭给出的回答则是不要脸才能爱更久。分手复合再分手，这是他俩调情的方式，仇人见面会分外眼红，而兔旭不会，避嫌也不会，反而会主动凑上去调戏对方，因为他俩不是仇人，而是贱人。形容爱情的词有很多，拥有爱情的人也有很多，但这样独特的贱人之爱我们却找不到世界上的第二对了"
+  },
+  "YMM": {
+    "code": "YMM",
+    "cn": "赌徒",
+    "intro": "他要做一个不可一世的赌徒",
+    "desc": "场均1.7闹麻了，X电竞捧杯吧！"
+  },
+  "GUOKER": {
+    "code": "GUOKER",
+    "cn": "三九九",
+    "intro": "李碧顿今天又被谁打了",
+    "desc": "看到你直接就喊过客，我心里咯瞪一下，您，是怎么想的呢？果壳也是您能直呼其名的？他是第一位历史399，是10s顶级ob位，是alf偶像，是飞轮兵发明者，是海底捞工作员认证小女孩，是第五人格排位影帝，是小作文朗读者，是无偿p图大师，是骄傲的少年，是ivl自己的大冰"
+  },
+  "YCL": {
+    "code": "YCL",
+    "cn": "郎的诱惑",
+    "intro": "质疑声再大一点好吗，怎么有点不够我看啊！",
+    "desc": "可是宝宝，我们x电竞是半职业和职业还是有差距的呀，我们从来没说过自己多厉害，从来没有说拳打脚踢随便赢我们从来没有说过随便赢微博，我们从来没说过自己是中国大陆最后的底牌"
+  },
+  "HUIYI": {
+    "code": "HUIYI",
+    "cn": "老登",
+    "intro": "回忆成了大问题",
+    "desc": "回忆老了，回忆嫩了，回忆成了大问题。从深渊一打过来的活化石就这样做牵制做救人都精彩。"
+  },
+  "JIN": {
+    "code": "JIN",
+    "cn": "金光新人",
+    "intro": "金黄强大无需多言",
+    "desc": "锦皇强，我投降所有人不许忤逆年锦i。求生者们你们最严厉的父亲金黄收你们来了！"
+  },
+  "YLT": {
+    "code": "YLT",
+    "cn": "加班",
+    "intro": "怎么又加赛了",
+    "desc": "慵懒兔神力，我已不敢直视神的眼睛。"
+  },
+  "TUDOU": {
+    "code": "TUDOU",
+    "cn": "暂停演绎",
+    "intro": "比赛是附赠，暂停是主业、",
+    "desc": "无能了 暂停了 说实在的早就有这个念头了 没觉得自己对不起谁 对不起的只有自己吧 也早就不在乎大家了 因为我觉得自己有两个人格 在大家面前的是外人看见的流水很高人气很高的一个游戏 另外一个就是天天出bug 打比赛必定暂停的一个游戏 土豆服务器早就不想干了 糟糕的心情也很多 现在是彻底解放了"
+  },
+  "BAILU": {
+    "code": "BAILU",
+    "cn": "爱踢职业",
+    "intro": "别用你的职业，挑战我的爱好",
+    "desc": "大家有对白露有不满的地方都可以提出来，尽情发言，一会就给你们全毕业了。m的竟敢对白露不满，顺白露者昌逆白露者亡。能面刺白露之过者，诛九族。上网谏白露者，处极刑。谤讥于市朝闻白露之耳者，赐自尽"
+  },
+  "HENGH": {
+    "code": "HENGH",
+    "cn": "正在热身",
+    "intro": "主教练正在热身！",
+    "desc": "训粉大教练臀很大哦，西装暴徒第一人，就这样拯救队伍于水火之中！“哼哼我有一个单子你接不接，冠军单。”"
+  },
+  "CHOAI": {
+    "code": "CHOAI",
+    "cn": "丑皇",
+    "intro": "丑皇出场无人能敌。",
+    "desc": "三年来 看着你从青涩走向沉稳 看着你逐渐扛起队伍的重担 。春风若有怜花意 可否许我再少年。"
+  },
+  "YAN": {
+    "code": "YAN",
+    "cn": "花瓶",
+    "intro": "虽然我菜但我好看。",
+    "desc": "天神下凡脸着地，祈颜病毒还在传播......"
+  },
+  "ZIRO": {
+    "code": "ZIRO",
+    "cn": "白板",
+    "intro": "38星人皇来咯。",
+    "desc": "38星关系户 ，我叫零次你记住\n永眠镇，玩守墓，10秒两铲我最酷\n月亮河，玩佣兵，爱点大门拦不住\n里奥回忆掏大副，坑死年锦没难度"
+  },
+  "TY": {
+    "code": "TY",
+    "cn": "拳击手",
+    "intro": "拳击教练来支持了。",
+    "desc": "致敬传奇拳击王之重蹈朱雀荣光义不容辞！\n还有黄志榕我真心问你一句，你爱的到底是一路走过来的竹马苏晗，还是命中宿敌魅魔游沭钊，还是那年一眼定终身的纯元白月光陈彦旭？"
+  },
+};
+    // 人格类型图片映射：存储各角色的图片路径
+    const TYPE_IMAGES = {
+  "487": "./image/487.png",
+  "BAILU": "./image/BAILU.png",
+  "CHOAI": "./image/CHOAI.png",
+  "DONGX": "./image/DONGX.png",
+  "GUOKER": "./image/GUOKER.png",
+  "HENGH": "./image/HENGH.png",
+  "HUIYI": "./image/HUIYI.png",
+  "JIN": "./image/JIN.png",
+  "N1E": "./image/N1E.png",
+  "PPX": "./image/PPX.png",
+  "TUDOU": "./image/TUDOU.png",
+  "TY": "./image/TY.png",
+  "TZYM": "./image/TZYM.png",
+  "YAN": "./image/YAN.png",
+  "YCL": "./image/YCL.png",
+  "YLT": "./image/YLT.png",
+  "YMM": "./image/YMM.png",
+  "ZIRO": "./image/ZIRO.png"
+};
+
+    // 正常人格类型：定义各角色的分数向量
+	const NORMAL_TYPES = [
+	  { code:"487", vector:[10,6,11,7,6,8,9,10,11,10] },
+	  { code:"DONGX", vector:[11,11,10,11,10,5,5,9,11,5] },
+	  { code:"PPX", vector:[9,10,8,10,8,5,6,11,9,6] },
+	  { code:"N1E", vector:[7,5,6,8,5,9,8,7,6,8] },
+	  { code:"TZYM", vector:[8,5,6,7,6,11,10,10,6,8] },
+	  { code:"YMM", vector:[8,5,5,7,5,11,11,9,11,10] },
+	  { code:"GUOKER", vector:[6,7,6,6,6,10,8,7,7,7] },
+	  { code:"YCL", vector:[9,6,8,6,7,8,9,11,9,7] },
+	  { code:"HUIYI", vector:[5,8,6,5,6,5,6,7,7,5] },
+	  { code:"JIN", vector:[9,7,7,10,7,6,7,8,8,7] },
+	  { code:"YLT", vector:[7,7,5,6,8,7,6,6,6,7] },
+	  { code:"TUDOU", vector:[5,6,5,5,5,11,7,6,5,6] },
+	  { code:"BAILU", vector:[11,9,7,11,8,5,7,9,9,8] },
+	  { code:"HENGH", vector:[7,9,9,6,7,5,6,8,8,5] },
+	  { code:"CHOAI", vector:[7,6,5,8,5,11,8,9,7,9] },
+	  { code:"YAN", vector:[6,5,5,6,5,11,10,11,6,7] },
+	  { code:"ZIRO", vector:[6,7,6,5,6,8,7,8,5,6] },
+	  { code:"TY", vector:[11,7,6,10,7,7,9,8,10,11] }
+	];
+    // 维度解释：为每个维度的不同水平提供解释
+	const DIM_EXPLANATIONS = {
+	  AGG: {
+		L: "你更像稳健型选手，不会轻易把自己交到危险位置。比起强行开节奏，你更愿意等对面露破绽再出手。赛场上这种风格不一定耀眼，但能减少无谓失误，适合慢慢把局势磨到自己能接受的范围里。",
+		M: "你的进攻欲和风险意识比较平衡。该抢节奏的时候敢上，该稳住局面的时候也能收手。你不是一味莽，也不是只会保守，更多时候会根据局势、阵容和队友状态决定要不要主动出击。",
+		H: "你的压迫感很强，喜欢主动把比赛节奏抓到自己手里。无论是监管开局找人、求生者主动运营，还是关键团战博弈，你都更倾向先动手。优点是容易打出名场面，缺点是有时会把风险也一起拉满。"
+	  },
+	  STL: {
+		L: "你的状态波动比较明显，顺起来可以像高光集锦，乱起来也可能突然断电。比赛里你容易被节奏、失误或外界声音影响，需要一点时间重新找回手感。你不是没上限，只是下限偶尔会让人心脏骤停。",
+		M: "你的整体发挥比较稳定，但还保留一点起伏空间。大多数时候你能完成自己的任务，不会轻易崩盘；但遇到高压局、关键分或逆风开局时，状态可能会有明显变化。你属于需要局势帮你热起来的类型。",
+		H: "你是那种关键局也不容易变形的人。无论局势顺逆，都能按自己的节奏处理信息、判断路线和完成操作。你不一定每次都最亮眼，但很少成为突破口，是队伍里让人放心的一块地基。"
+	  },
+	  CMD: {
+		L: "你不太喜欢站出来指挥全局，更习惯专注自己手上的任务。比赛里你可能是安静执行位，做好牵制、修机、救人或追击细节。你不抢话语权，但如果队伍需要稳定执行，你反而很适合。",
+		M: "你有一定控场意识，会在需要的时候参与判断。你不一定全程指挥，但能看懂局势变化，知道什么时候该转点、补机、保人或压节奏。你更像临场协作者，既能听安排，也能提出自己的想法。",
+		H: "你很想掌控比赛走向，不喜欢局势散掉。你会主动判断节奏、分配资源、提醒队友，甚至在混乱局里强行把大家拉回同一个目标。优点是大局观强，缺点是容易因为太想控场而给自己压力。"
+	  },
+	  MEC: {
+		L: "你不是特别追求花活，更重视实用和容错。比起极限博弈，你会选择更稳的路线、更安全的交互和更合理的资源使用。你可能不常出现在高光剪辑里，但很多时候正是这种不犯病让局势活下来。",
+		M: "你有操作欲，但不会为了秀而秀。能打细节的时候你愿意尝试，风险太高时也会选择稳妥方案。你比较适合在常规运营里穿插亮点，既有观赏性，也不会完全牺牲比赛收益。",
+		H: "你很容易被高难操作吸引，喜欢在极限距离、极限时间和极限资源里打出东西。你的高光可能非常夸张，观众看了会喊，但风险也同样真实。你适合成为破局点，但也需要学会什么时候别硬秀。"
+	  },
+	  ADP: {
+		L: "你更依赖熟悉的体系和节奏。版本变化、阵容调整或临场变招会让你有点不舒服，需要时间重新适应。你不是不能变，而是更适合在稳定环境里发挥，一旦体系被打乱，状态会受影响。",
+		M: "你的适应力处在比较健康的范围。面对版本改动、对手变化或临时策略，你大多能跟上，只是需要一点观察和调整时间。你不一定是最快变阵的人，但不会长期卡在旧思路里。",
+		H: "你对变化非常敏感，也很会顺着版本和局势找答案。无论是新角色、新打法、临场换节奏，还是对手突然变招，你都能比较快地重新组织思路。你像队伍里的变速器，环境越乱越能显出价值。"
+	  },
+	  MEM: {
+		L: "你偏严肃，不太主动制造节目效果。比起整活、玩梗和场外名场面，你更在意比赛内容本身。你可能不是弹幕最爱调侃的类型，但也不容易因为多余操作把自己送上奇怪热搜。",
+		M: "你有一点节目效果，但通常不会失控。顺风时会轻松一点，逆风时也可能冒出几句让人记住的话。你的整活更像调味料，不会盖过比赛本身，却能让人觉得你有自己的味道。",
+		H: "你自带节目效果，很容易成为观众记忆点。无论是发言、操作、表情还是某些离谱瞬间，都有概率被剪成名场面。你可能不是最稳的那种人，但一定不无聊，比赛有你就很难完全冷场。"
+	  },
+	  EMO: {
+		L: "你情绪比较内收，不太容易让别人看出你真实状态。哪怕局势很紧，你也倾向自己消化，不会马上表现出来。优点是看上去很稳，缺点是队友可能不知道你已经压力拉满。",
+		M: "你会表达情绪，但通常知道分寸。该沟通时能说，该忍住时也能忍住。你不会把所有压力都倒出来，也不会完全憋着不讲，在比赛和人际里都比较容易维持正常节奏。",
+		H: "你的情绪存在感很强，开心、急躁、上头、委屈都容易被看出来。你能带动气氛，也可能把压力传染给别人。顺风时很有感染力，逆风时需要有人帮你稳一下，不然脑袋一热什么都来了。"
+	  },
+	  AUR: {
+		L: "你的存在感相对低调，不太主动抢镜。你可能更愿意藏在体系里完成任务，而不是成为全场焦点。观众不一定第一眼记住你，但熟悉之后会发现你有自己的稳定价值。",
+		M: "你有一定舞台感，能在关键时刻被看见。你不是每局都站在聚光灯下，但当你打出关键牵制、关键追击或关键决策时，存在感会突然变强。你属于有高光潜力但不刻意营业的类型。",
+		H: "你很容易成为全场焦点。无论是打法、气质、发言还是名场面，都有一种让人记住的能力。你不一定每次都赢，但观众很难忽略你。舞台越大，你越容易被放大，也越容易被讨论。"
+	  },
+	  BEL: {
+		L: "你容易受到局势和外界评价影响。逆风、失误或质疑声会让你开始怀疑自己的判断。你需要队友、体系或一场顺局帮你重新找回信心，一旦心态稳住，其实也能打出不错内容。",
+		M: "你有自己的坚持，但不会完全听不进意见。你能在质疑和自信之间来回调整，既不会轻易放弃目标，也不至于一路撞墙。你适合在有人交流和复盘的环境里持续变强。",
+		H: "你的信念感很强，认定的东西很难被轻易动摇。关键分、逆风局、外界压力都不一定能把你打散。你很适合扛旗和撑场面，但也要小心太相信自己，导致明明该变招却硬走到底。"
+	  },
+	  TEAM: {
+		L: "你更相信团队协作，愿意把自己放进整体节奏里。你不执着于一个人解决所有问题，更看重配合、补位、信息和资源交换。你可能不是最爱出风头的人，但很适合成为团队稳定运转的一部分。",
+		M: "你能在个人发挥和团队配合之间切换。需要你站出来时，你愿意承担；需要你服务团队时，也能接受安排。你的风格比较弹性，不会过分独，也不会完全失去个人判断。",
+		H: "你关键时刻很想靠自己改写局势。越是压力大的地方，你越容易产生我来的想法。你可能打出非常漂亮的个人破局，也可能因为太想拯救比赛而吃到反噬。你是典型的高风险高存在感类型。"
+	  }
+	};
+    // 维度顺序：定义计算结果时的维度顺序
+	const dimensionOrder = [
+	  'AGG','STL','CMD','MEC','ADP',
+	  'MEM','EMO','AUR','BEL','TEAM'
+	];
+    // 应用状态：存储测试相关的状态
+    const app = {
+      shuffledQuestions: [],  // 打乱后的问题列表
+      answers: {},           // 用户回答
+      currentQuestionIndex: 0, // 当前题目页码
+      missingQuestionId: null, // 当前提示的漏选题
+      previewMode: false     // 是否预览模式
+    };
+
+    // 屏幕元素：存储页面上的三个主要屏幕
+    const screens = {
+      intro: document.getElementById('intro'),  // 首页屏幕
+      test: document.getElementById('test'),    // 测试屏幕
+      result: document.getElementById('result') // 结果屏幕
+    };
+
+    // DOM元素：存储页面上的关键元素
+    const questionList = document.getElementById('questionList');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const submitBtn = document.getElementById('submitBtn');
+    const testHint = document.getElementById('testHint');
+
+    // 显示指定屏幕
+    function showScreen(name) {
+      Object.entries(screens).forEach(([key, el]) => {
+        el.classList.toggle('active', key === name);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 打乱数组顺序
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // 获取可见的问题列表
+    function getVisibleQuestions() {
+      const visible = [...app.shuffledQuestions];
+      return visible;
+    }
+
+
+    // 渲染当前题目页
+    function renderQuestions() {
+      const visibleQuestions = getVisibleQuestions();
+      const total = visibleQuestions.length;
+      if (total === 0) {
+        questionList.innerHTML = '';
+        updateProgress();
+        return;
+      }
+
+      app.currentQuestionIndex = Math.min(Math.max(app.currentQuestionIndex, 0), total - 1);
+      const q = visibleQuestions[app.currentQuestionIndex];
+      const hasAnswer = app.answers[q.id] !== undefined;
+      const card = document.createElement('article');
+      card.className = app.missingQuestionId === q.id ? 'question missing' : 'question';
+      card.dataset.questionId = q.id;
+      card.innerHTML = `
+        <div class="question-meta">
+          <div class="badge">第 ${app.currentQuestionIndex + 1} / ${total} 题</div>
+        </div>
+        <div class="question-title">${q.text}</div>
+        <div class="question-warning">这道题还没有选择，请先选一个答案。</div>
+        <div class="options">
+          ${q.options.map((opt, i) => {
+            const code = ['A', 'B', 'C', 'D', 'E'][i] || String(i + 1);
+            const checked = app.answers[q.id] === opt.value ? 'checked' : '';
+            return `
+              <label class="option">
+                <input type="radio" name="${q.id}" value="${opt.value}" ${checked} />
+                <div class="option-code">${code}</div>
+                <div>${opt.label}</div>
+              </label>
+            `;
+          }).join('')}
+        </div>
+        <div class="question-nav">
+          <button type="button" class="btn-secondary" data-page-action="prev" ${app.currentQuestionIndex === 0 ? 'disabled' : ''}>上一题</button>
+          <button type="button" class="btn-secondary" data-page-action="next" ${(!hasAnswer || app.currentQuestionIndex === total - 1) ? 'disabled' : ''}>下一题</button>
+        </div>
+      `;
+
+      questionList.innerHTML = '';
+      questionList.appendChild(card);
+
+      questionList.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const { name, value } = e.target;
+          app.answers[name] = Number(value);
+          app.missingQuestionId = null;
+          const currentCard = e.target.closest('.question');
+          if (currentCard) currentCard.classList.remove('missing');
+          renderQuestions();
+        });
+      });
+
+      questionList.querySelectorAll('[data-page-action]').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const action = e.currentTarget.dataset.pageAction;
+          app.currentQuestionIndex += action === 'prev' ? -1 : 1;
+          app.missingQuestionId = null;
+          renderQuestions();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+
+      updateProgress();
+    }
+    // 更新进度条
+    function updateProgress() {
+      const visibleQuestions = getVisibleQuestions();
+      const total = visibleQuestions.length;
+      const done = visibleQuestions.filter(q => app.answers[q.id] !== undefined).length;
+      const percent = total ? (done / total) * 100 : 0;
+      progressBar.style.width = `${percent}%`;
+      progressText.textContent = `${done} / ${total}`;
+      const complete = done === total && total > 0;
+      submitBtn.disabled = total === 0 || app.currentQuestionIndex !== total - 1;
+      testHint.textContent = '';
+    }
+
+    function validateAnswers() {
+      const visibleQuestions = getVisibleQuestions();
+      const missingQuestions = visibleQuestions.filter(q => app.answers[q.id] === undefined);
+
+      if (missingQuestions.length === 0) return true;
+
+      const firstMissing = missingQuestions[0];
+      const firstMissingIndex = visibleQuestions.findIndex(q => q.id === firstMissing.id);
+      app.currentQuestionIndex = firstMissingIndex >= 0 ? firstMissingIndex : 0;
+      app.missingQuestionId = firstMissing.id;
+      renderQuestions();
+      testHint.textContent = '';
+      return false;
+    }
+    // 将分数转换为等级（L/M/H）
+    function sumToLevel(score, maxScore) {
+      const thirdScore = maxScore / 3;
+      const twoThirdsScore = maxScore * 2 / 3;
+      if (score < thirdScore) return 'L';
+      if (score < twoThirdsScore) return 'M';
+      return 'H';
+    }
+
+    // 计算测试结果
+    function computeResult() {
+      const rawScores = {};
+      const levels = {};
+      const dimQuestionCount = {};
+      // 初始化每个维度的分数和问题数为0
+      Object.keys(dimensionMeta).forEach(dim => { 
+        rawScores[dim] = 0;
+        dimQuestionCount[dim] = 0;
+      });
+
+      // 计算每个维度的总分和问题数
+      questions.forEach(q => {
+        rawScores[q.dim] += Number(app.answers[q.id] || 0);
+        dimQuestionCount[q.dim]++;
+      });
+
+      // 将每个维度的分数转换为等级
+      Object.entries(rawScores).forEach(([dim, score]) => {
+        const maxScore = dimQuestionCount[dim] * 5; // 每个问题满分5分
+        levels[dim] = sumToLevel(score, maxScore);
+      });
+
+      // 计算用户向量和每个角色的相似度（使用原始分数）
+      const userVector = dimensionOrder.map(dim => rawScores[dim]);
+      const ranked = NORMAL_TYPES.map(type => {
+        const vector = type.vector;
+        
+        let distance = 0;
+        let totalPossibleDistance = 0;
+        for (let i = 0; i < vector.length; i++) {
+          const diff = Math.abs(userVector[i] - vector[i]);
+          distance += diff;
+          totalPossibleDistance += 12; // 每个维度最大可能差异为12
+        }
+        const similarity = Math.max(0, Math.round((1 - distance / totalPossibleDistance) * 100));
+        return { ...type, ...TYPE_LIBRARY[type.code], distance, similarity };
+      }).sort((a, b) => {
+        if (a.similarity !== b.similarity) return b.similarity - a.similarity;
+        return a.distance - b.distance;
+      });
+
+      const bestNormal = ranked[0];
+      let finalType;
+      let modeKicker = '你的IVL赛事人格';
+      let badge = `匹配度 ${bestNormal.similarity}%`;
+      let sub = '维度命中度较高，你非常像这位角色！';
+      let special = false;
+      let secondaryType = null;
+
+      finalType = bestNormal;
+
+      return {
+        rawScores,
+        levels,
+        ranked,
+        bestNormal,
+        finalType,
+        modeKicker,
+        badge,
+        sub,
+        special,
+        secondaryType
+      };
+    }
+
+    // 渲染维度列表
+    function renderDimList(result) {
+      const dimList = document.getElementById('dimList');
+      dimList.innerHTML = dimensionOrder.map(dim => {
+        const level = result.levels[dim];
+        const score = result.rawScores[dim];
+        const dimName = dimensionMeta[dim].name;
+        const explanation = DIM_EXPLANATIONS[dim][level];
+        
+        return `
+          <div class="dim-item">
+            <div class="dim-item-top">
+              <div class="dim-item-name">${dimName}</div>
+              <div class="dim-item-score">${level} / ${score}分</div>
+            </div>
+            <p>${explanation}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 渲染结果页面
+    function renderResult() {
+      if (!validateAnswers()) return;
+
+      const result = computeResult();
+      const type = result.finalType;
+
+      // 更新结果页面的内容
+      document.getElementById('resultModeKicker').textContent = result.modeKicker;
+      document.getElementById('resultTypeName').textContent = type.code;
+      document.getElementById('matchBadge').textContent = result.badge;
+      document.getElementById('resultTypeSub').textContent = result.sub;
+      document.getElementById('resultDesc').textContent = type.desc;
+      document.getElementById('posterCaption').textContent = type.intro;
+      document.getElementById('funNote').textContent = '本测试仅供娱乐，角色定义并不全面，请勿过度较真。';
+
+      // 处理角色图片
+      const posterBox = document.getElementById('posterBox');
+      const posterImage = document.getElementById('posterImage');
+      const imageSrc = TYPE_IMAGES[type.code];
+      if (imageSrc) {
+        posterImage.src = imageSrc;
+        posterImage.alt = `${type.code}（${type.cn}）`;
+        posterBox.classList.remove('no-image');
+      } else {
+        posterImage.removeAttribute('src');
+        posterImage.alt = '';
+        posterBox.classList.add('no-image');
+      }
+
+      // 渲染维度列表并显示结果屏幕
+      renderDimList(result);
+      showScreen('result');
+    }
+
+    // 开始测试
+    function startTest(preview = false) {
+      app.previewMode = preview;
+      app.answers = {};
+      app.currentQuestionIndex = 0;
+      app.missingQuestionId = null;
+      const shuffledRegular = shuffle(questions);
+      app.shuffledQuestions = shuffledRegular;
+      renderQuestions();
+      showScreen('test');
+    }
+
+
+
+    // 事件监听器：绑定按钮点击事件
+    document.getElementById('startBtn').addEventListener('click', () => startTest(false));
+    document.getElementById('backIntroBtn').addEventListener('click', () => showScreen('intro'));
+    document.getElementById('submitBtn').addEventListener('click', renderResult);
+    document.getElementById('restartBtn').addEventListener('click', () => startTest(false));
+    document.getElementById('toTopBtn').addEventListener('click', () => showScreen('intro'));
+  </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
