@@ -1165,6 +1165,42 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function getResultScoresParam(rawScores) {
+      return dimensionOrder.map(dim => rawScores[dim] || 0).join(',');
+    }
+
+    function parseRawScoresParam(value) {
+      if (!value) return null;
+      const parts = value.split(',').map(item => Number(item));
+      if (parts.length !== dimensionOrder.length || parts.some(num => !Number.isFinite(num))) {
+        return null;
+      }
+
+      const rawScores = {};
+      dimensionOrder.forEach((dim, index) => {
+        rawScores[dim] = parts[index];
+      });
+      return rawScores;
+    }
+
+    function updateRoute(name, options = {}) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('page');
+      url.searchParams.delete('scores');
+
+      if (name === 'test') {
+        url.searchParams.set('page', 'test');
+      }
+
+      if (name === 'result' && options.rawScores) {
+        url.searchParams.set('page', 'result');
+        url.searchParams.set('scores', getResultScoresParam(options.rawScores));
+      }
+
+      const method = options.replace ? 'replaceState' : 'pushState';
+      window.history[method]({}, '', url);
+    }
+
     // 打乱数组顺序
     function shuffle(array) {
       const arr = [...array];
@@ -1286,29 +1322,27 @@
     }
 
     // 计算测试结果
-    function computeResult() {
-      const rawScores = {};
+    function buildLevelsFromRawScores(rawScores) {
       const levels = {};
       const dimQuestionCount = {};
-      // 初始化每个维度的分数和问题数为0
-      Object.keys(dimensionMeta).forEach(dim => { 
-        rawScores[dim] = 0;
+      Object.keys(dimensionMeta).forEach(dim => {
         dimQuestionCount[dim] = 0;
       });
 
-      // 计算每个维度的总分和问题数
       questions.forEach(q => {
-        rawScores[q.dim] += Number(app.answers[q.id] || 0);
         dimQuestionCount[q.dim]++;
       });
 
-      // 将每个维度的分数转换为等级
       Object.entries(rawScores).forEach(([dim, score]) => {
-        const maxScore = dimQuestionCount[dim] * 5; // 每个问题满分5分
+        const maxScore = dimQuestionCount[dim] * 5;
         levels[dim] = sumToLevel(score, maxScore);
       });
+      return levels;
+    }
 
-      // 计算用户向量和每个角色的相似度（使用原始分数）
+    function computeResultFromRawScores(rawScores) {
+      const levels = buildLevelsFromRawScores(rawScores);
+
       const userVector = dimensionOrder.map(dim => rawScores[dim]);
       const ranked = NORMAL_TYPES.map(type => {
         const vector = type.vector;
@@ -1351,6 +1385,19 @@
       };
     }
 
+    function computeResult() {
+      const rawScores = {};
+      Object.keys(dimensionMeta).forEach(dim => {
+        rawScores[dim] = 0;
+      });
+
+      questions.forEach(q => {
+        rawScores[q.dim] += Number(app.answers[q.id] || 0);
+      });
+
+      return computeResultFromRawScores(rawScores);
+    }
+
     // 渲染维度列表
     function renderDimList(result) {
       const dimList = document.getElementById('dimList');
@@ -1373,13 +1420,9 @@
     }
 
     // 渲染结果页面
-    function renderResult() {
-      if (!validateAnswers()) return;
-
-      const result = computeResult();
+    function renderResultFromData(result, options = {}) {
       const type = result.finalType;
 
-      // 更新结果页面的内容
       document.getElementById('resultModeKicker').textContent = result.modeKicker;
       document.getElementById('resultTypeName').textContent = type.code;
       document.getElementById('matchBadge').textContent = result.badge;
@@ -1388,7 +1431,6 @@
       document.getElementById('posterCaption').textContent = type.intro;
       document.getElementById('funNote').textContent = '本测试仅供娱乐，角色定义并不全面，请勿过度较真。';
 
-      // 处理角色图片
       const posterBox = document.getElementById('posterBox');
       const posterImage = document.getElementById('posterImage');
       const imageSrc = TYPE_IMAGES[type.code];
@@ -1402,13 +1444,20 @@
         posterBox.classList.add('no-image');
       }
 
-      // 渲染维度列表并显示结果屏幕
       renderDimList(result);
+      if (options.updateRoute !== false) {
+        updateRoute('result', { rawScores: result.rawScores });
+      }
       showScreen('result');
     }
 
+    function renderResult() {
+      if (!validateAnswers()) return;
+      renderResultFromData(computeResult());
+    }
+
     // 开始测试
-    function startTest(preview = false) {
+    function startTest(preview = false, options = {}) {
       app.previewMode = preview;
       app.answers = {};
       app.currentQuestionIndex = 0;
@@ -1416,17 +1465,46 @@
       const shuffledRegular = shuffle(questions);
       app.shuffledQuestions = shuffledRegular;
       renderQuestions();
+      if (options.updateRoute !== false) {
+        updateRoute('test', { replace: options.replace });
+      }
       showScreen('test');
+    }
+
+    function goIntro(replace = false) {
+      updateRoute('intro', { replace });
+      showScreen('intro');
+    }
+
+    function restoreScreenFromUrl() {
+      const url = new URL(window.location.href);
+      const page = url.searchParams.get('page');
+      const rawScores = parseRawScoresParam(url.searchParams.get('scores'));
+
+      if (page === 'result' && rawScores) {
+        renderResultFromData(computeResultFromRawScores(rawScores), { updateRoute: false });
+        return;
+      }
+
+      if (page === 'test') {
+        startTest(false, { updateRoute: false });
+        return;
+      }
+
+      goIntro(true);
     }
 
 
 
     // 事件监听器：绑定按钮点击事件
     document.getElementById('startBtn').addEventListener('click', () => startTest(false));
-    document.getElementById('backIntroBtn').addEventListener('click', () => showScreen('intro'));
+    document.getElementById('backIntroBtn').addEventListener('click', () => goIntro());
     document.getElementById('submitBtn').addEventListener('click', renderResult);
     document.getElementById('restartBtn').addEventListener('click', () => startTest(false));
-    document.getElementById('toTopBtn').addEventListener('click', () => showScreen('intro'));
+    document.getElementById('toTopBtn').addEventListener('click', () => goIntro());
+    window.addEventListener('popstate', restoreScreenFromUrl);
+
+    restoreScreenFromUrl();
   </script>
 
 </body>
