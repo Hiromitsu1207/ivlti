@@ -2,6 +2,11 @@
 
 一个基于《第五人格》IVL 赛事圈层梗文化制作的网页人格测试项目。
 
+## 在线地址
+
+- 已部署上线：[ivlti.asia](https://ivlti.asia)
+- 小红书链接：[http://xhslink.com/o/5fqLQi5icIP](http://xhslink.com/o/5fqLQi5icIP)
+
 用户通过 30 道题得到 10 个维度分数，最终匹配到一个最接近的 IVL 角色类型。项目为纯前端静态页面，不依赖后端，打开 `index.html` 即可运行。
 
 ## 项目特点
@@ -142,3 +147,4 @@ iviti/
 ## 免责声明
 
 本测试仅供娱乐，请勿较真。
+
